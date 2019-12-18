@@ -1,0 +1,31 @@
+package types
+
+import (
+	"log"
+)
+
+//ErrorMessage hold the return value when there is an error
+type ErrorMessage struct {
+	StatusCode int    `json:"status_code,omitempty"`
+	Message    string `json:"message,omitempty"`
+}
+
+//EncryptResponse
+type EncryptResponse struct {
+	Base64EncodedCipherText string `json:"base64_cipher_text,omitempty"`
+}
+
+//DecryptResponse
+type DecryptResponse struct {
+	ClearText string `json:"clear_text,omitempty"`
+}
+
+//log levels, default is error
+var (
+	Info    *log.Logger
+	Warning *log.Logger
+	Error   *log.Logger
+)
+
+//Name
+var Name string

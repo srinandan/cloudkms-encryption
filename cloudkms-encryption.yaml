@@ -1,0 +1,52 @@
+#create a secret
+#kubectl create secret -n apigee generic cloudkms-encryption-svc-account --from-file client_secret.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudkms-encryption
+  labels:
+    app: cloudkms-encryption
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: cloudkms-encryption
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cloudkms-encryption
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cloudkms-encryption
+        version: v1
+    spec:
+      containers:
+      - image: gcr.io/nandanks-151422/cloudkms-encryption
+        imagePullPolicy: Always
+        name: cloudkms-encryption
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /etc/secret/client_secret.json #ensure the file name matches the kubectl secret
+          - name: DEBUG
+            value: "false" #set to true to enable debug            
+        volumeMounts:
+          - mountPath: /etc/secret
+            name: svc-account-volume
+            readOnly: true
+      volumes:
+      - name: svc-account-volume
+        secret:
+          defaultMode: 420
+          secretName: cloudkms-encryption-svc-account                      
+---

@@ -29,8 +29,15 @@ func EncryptSymmetric(name string, plaintext []byte) (string, error) {
 		return "", fmt.Errorf("encrypt error: %v", err)
 	}
 
+	//close client
+	err = client.Close()
+	if err != nil {
+		return "", fmt.Errorf("error closing: %v", err)
+	}
+
 	//base64 encode the cipher
 	b64CipherText := base64.StdEncoding.EncodeToString(resp.Ciphertext)
+	
 
 	return b64CipherText, nil
 }
@@ -60,5 +67,12 @@ func DecryptSymmetric(name string, b64CipherText []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("decrypt: %v", err)
 	}
+
+	//close client
+	err = client.Close()
+	if err != nil {
+		return nil, fmt.Errorf("error closing: %v", err)
+	}
+
 	return resp.Plaintext, nil
 }

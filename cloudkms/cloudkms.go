@@ -6,38 +6,43 @@ import (
 	"fmt"
 
 	kms "cloud.google.com/go/kms/apiv1"
+	types "github.com/srinandan/cloudkms-encryption/types"
 	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
 )
 
+//InitKms initializes a connection to KMS
+func InitKMS() (err error) {
+	types.Ctx = context.Background()
+	types.Client, err = kms.NewKeyManagementClient(types.Ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//CloseKMS closes the client connection when shutting down the server
+func CloseKMS() {
+	if types.Client != nil {
+		_ = types.Client.Close()
+	}
+}
+
 //EncryptSymmetric will encrypt the input plaintext with the specified symmetric key.
 func EncryptSymmetric(name string, plaintext []byte) (string, error) {
-	ctx := context.Background()
-
-	client, err := kms.NewKeyManagementClient(ctx)
-	if err != nil {
-		return "", fmt.Errorf("kms.NewKeyManagementClient: %v", err)
-	}
-
 	// Build the request.
 	req := &kmspb.EncryptRequest{
 		Name:      name,
 		Plaintext: plaintext,
 	}
+
 	// Call the API.
-	resp, err := client.Encrypt(ctx, req)
+	resp, err := types.Client.Encrypt(types.Ctx, req)
 	if err != nil {
 		return "", fmt.Errorf("encrypt error: %v", err)
 	}
 
-	//close client
-	err = client.Close()
-	if err != nil {
-		return "", fmt.Errorf("error closing: %v", err)
-	}
-
 	//base64 encode the cipher
 	b64CipherText := base64.StdEncoding.EncodeToString(resp.Ciphertext)
-	
 
 	return b64CipherText, nil
 }
@@ -50,28 +55,15 @@ func DecryptSymmetric(name string, b64CipherText []byte) ([]byte, error) {
 		return nil, fmt.Errorf("decode: %v", err)
 	}
 
-	ctx := context.Background()
-	
-	client, err := kms.NewKeyManagementClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("kms.NewKeyManagementClient: %v", err)
-	}
-
 	// Build the request.
 	req := &kmspb.DecryptRequest{
 		Name:       name,
 		Ciphertext: cipherText,
 	}
 	// Call the API.
-	resp, err := client.Decrypt(ctx, req)
+	resp, err := types.Client.Decrypt(types.Ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("decrypt: %v", err)
-	}
-
-	//close client
-	err = client.Close()
-	if err != nil {
-		return nil, fmt.Errorf("error closing: %v", err)
 	}
 
 	return resp.Plaintext, nil

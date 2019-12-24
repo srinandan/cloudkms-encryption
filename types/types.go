@@ -1,6 +1,8 @@
 package types
 
 import (
+	kms "cloud.google.com/go/kms/apiv1"
+	"context"
 	"log"
 )
 
@@ -29,3 +31,9 @@ var (
 
 //Name
 var Name string
+
+//Client connection to KMS
+var Client *kms.KeyManagementClient
+
+//Ctx for client connection
+var Ctx context.Context

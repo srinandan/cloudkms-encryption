@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	apis "github.com/srinandan/cloudkms-encryption/apis"
+	cloudkms "github.com/srinandan/cloudkms-encryption/cloudkms"
 	types "github.com/srinandan/cloudkms-encryption/types"
 	"io/ioutil"
 	"log"
@@ -64,6 +65,11 @@ func main() {
 	if !InitParams() {
 		types.Error.Fatalln("PROJECT_ID, REGION, KEY_RING and CRYPTO_KEY are mandatory params")
 	}
+	//init client connection to cloud KMS
+	kmsErr := cloudkms.InitKMS()
+	if kmsErr != nil {
+		types.Error.Fatalln("error connecting to KMS ", kmsErr)
+	}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/encrypt", apis.EncryptionHandler).
@@ -71,7 +77,7 @@ func main() {
 	r.HandleFunc("/decrypt", apis.DecryptionHandler).
 		Methods("POST")
 
-		//the following code is from gorilla mux samples
+	//the following code is from gorilla mux samples
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",
 		WriteTimeout: time.Second * 15,
@@ -82,7 +88,7 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
+			types.Error.Println(err)
 		}
 	}()
 	c := make(chan os.Signal, 1)
@@ -94,14 +100,15 @@ func main() {
 	<-c
 
 	// Create a deadline to wait for.
-	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	var cancel context.CancelFunc
+	types.Ctx, cancel = context.WithTimeout(context.Background(), wait)
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
-	srv.Shutdown(ctx)
-	// Optionally, you could run srv.Shutdown in a goroutine and block on
-	// <-ctx.Done() if your application should wait for other services
-	// to finalize based on context cancellation.
-	log.Println("shutting down")
+	srv.Shutdown(types.Ctx)
+	//close connection
+	cloudkms.CloseKMS()
+
+	types.Info.Println("shutting down")
 	os.Exit(0)
 }

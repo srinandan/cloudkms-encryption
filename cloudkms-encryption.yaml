@@ -32,14 +32,32 @@ spec:
         name: cloudkms-encryption
         ports:
         - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5        
         resources:
           requests:
-            cpu: 100m
+            cpu: 250m
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /etc/secret/client_secret.json #ensure the file name matches the kubectl secret
           - name: DEBUG
-            value: "false" #set to true to enable debug            
+            value: "false" #set to true to enable debug
+          - name: PROJECT_ID
+            value: "nandanks-151422"
+          - name: REGION
+            value: "us-west1"
+          - name: KEY_RING
+            value: "test"
+          - name: CRYPTO_KEY
+            value: "symmetric-key"
+          - name: SECRET_NAME
+            value: "test"
+          - name: SECRET_VERSION
+            value: "1"                                                                        
         volumeMounts:
           - mountPath: /etc/secret
             name: svc-account-volume

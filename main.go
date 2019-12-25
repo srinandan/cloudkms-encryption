@@ -2,84 +2,49 @@ package main
 
 import (
 	"context"
-	"github.com/gorilla/mux"
-	apis "github.com/srinandan/cloudkms-encryption/apis"
-	cloudkms "github.com/srinandan/cloudkms-encryption/cloudkms"
-	types "github.com/srinandan/cloudkms-encryption/types"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
+	apis "github.com/srinandan/cloudkms-encryption/apis"
+	clientapp "github.com/srinandan/cloudkms-encryption/clientapp"
+	types "github.com/srinandan/cloudkms-encryption/types"
 )
-
-//Init function initializes the logger objects
-func Init() {
-	var infoHandle = ioutil.Discard
-
-	debug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
-
-	if debug {
-		infoHandle = os.Stdout
-	}
-
-	warningHandle := os.Stdout
-	errorHandle := os.Stdout
-
-	types.Info = log.New(infoHandle,
-		"INFO: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	types.Warning = log.New(warningHandle,
-		"WARNING: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	types.Error = log.New(errorHandle,
-		"ERROR: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-}
-
-func InitParams() bool {
-	projectID := os.Getenv("PROJECT_ID")
-	region := os.Getenv("REGION")
-	keyRing := os.Getenv("KEY_RING")
-	cryptoKey := os.Getenv("CRYPTO_KEY")
-
-	if (cryptoKey == "") || (keyRing == "") || (region == "") || (projectID == "") {
-		return false
-	}
-
-	types.Name = "projects/" + projectID + "/locations/" + region + "/keyRings/" +
-		keyRing + "/cryptoKeys/" + cryptoKey
-
-	return true
-}
 
 func main() {
 	var wait time.Duration
-	//init logging
-	Init()
-	//init params
-	if !InitParams() {
-		types.Error.Fatalln("PROJECT_ID, REGION, KEY_RING and CRYPTO_KEY are mandatory params")
-	}
-	//init client connection to cloud KMS
-	kmsErr := cloudkms.InitKMS()
-	if kmsErr != nil {
-		types.Error.Fatalln("error connecting to KMS ", kmsErr)
-	}
+
+	const address = "0.0.0.0:8080"
+
+	//initialize
+	clientapp.Initialize()
 
 	r := mux.NewRouter()
+	r.HandleFunc("/healthz", apis.HealthHandler).
+		Methods("GET")
 	r.HandleFunc("/encrypt", apis.EncryptionHandler).
 		Methods("POST")
 	r.HandleFunc("/decrypt", apis.DecryptionHandler).
 		Methods("POST")
+	//registering this handler twice since the query param is optional
+	r.HandleFunc("/secrets/{secretName}/{version}", apis.RetrieveSecretHandler).
+		Methods("GET").
+		Queries("encrypted", "{encrypted}")
+	r.HandleFunc("/secrets/{secretName}/{version}", apis.RetrieveSecretHandler).
+		Methods("GET")
+
+	r.HandleFunc("/secrets", apis.CreateSecretHandler).
+		Methods("POST")
+	r.HandleFunc("/storesecrets", apis.StoreSecretHandler).
+		Methods("POST")
+
+	types.Info.Println("Starting server - ", address)
 
 	//the following code is from gorilla mux samples
 	srv := &http.Server{
-		Addr:         "0.0.0.0:8080",
+		Addr:         address,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
@@ -102,13 +67,14 @@ func main() {
 	// Create a deadline to wait for.
 	var cancel context.CancelFunc
 	types.Ctx, cancel = context.WithTimeout(context.Background(), wait)
+
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
 	srv.Shutdown(types.Ctx)
 	//close connection
-	cloudkms.CloseKMS()
+	clientapp.Close()
 
-	types.Info.Println("shutting down")
+	types.Info.Println("Shutting down")
 	os.Exit(0)
 }

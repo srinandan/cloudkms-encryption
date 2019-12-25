@@ -1,7 +1,6 @@
 package types
 
 import (
-	kms "cloud.google.com/go/kms/apiv1"
 	"context"
 	"log"
 )
@@ -12,28 +11,24 @@ type ErrorMessage struct {
 	Message    string `json:"message,omitempty"`
 }
 
-//EncryptResponse
-type EncryptResponse struct {
-	Base64EncodedCipherText string `json:"base64_cipher_text,omitempty"`
-}
-
-//DecryptResponse
-type DecryptResponse struct {
-	ClearText string `json:"clear_text,omitempty"`
+//Response structure used by all methods
+type Response struct {
+	Payload string `json:"payload,omitempty"`
 }
 
 //log levels, default is error
 var (
-	Info    *log.Logger
-	Warning *log.Logger
-	Error   *log.Logger
+	//Info is used for debug logs
+	Info *log.Logger
+	//Error is used to log errors
+	Error *log.Logger
 )
 
-//Name
-var Name string
+//KMSName stores the url in the formatproject/{project-id}/secrets/{secret}
+var KMSName string
 
-//Client connection to KMS
-var Client *kms.KeyManagementClient
+//Parent stores the url in the format project/{project-id}
+var Parent string
 
 //Ctx for client connection
 var Ctx context.Context

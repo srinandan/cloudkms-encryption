@@ -1,6 +1,6 @@
 # cloudkms-encryption
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/srinandan/cloundkms-encryption)](https://goreportcard.com/report/github.com/srinandan/cloudkms-encryption)
+[![Go Report Card](https://goreportcard.com/badge/github.com/srinandan/cloudkms-encryption)](https://goreportcard.com/report/github.com/srinandan/cloudkms-encryption)
 
 This service is meant to run as a sidecar to the Apigee hybrid API gateway (also known as Message Processor). The service takes a Google Cloud Service Account as a parameter and is used to encrypt or decrypt text using [Cloud KMS](https://cloud.google.com/kms/). The service can also store and retrieve data from GCP [Secret Manager](https://cloud.google.com/secret-manager/docs/).
 

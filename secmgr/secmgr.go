@@ -29,6 +29,7 @@ func Close() {
 	types.Info.Println("SecurityManager closed successfully")
 }
 
+//RetrieveSecret from Secret Manager
 func RetrieveSecret(name string) ([]byte, error) {
 	// Build the request.
 	req := &secretpb.AccessSecretVersionRequest{
@@ -44,6 +45,7 @@ func RetrieveSecret(name string) ([]byte, error) {
 	return resp.Payload.Data, nil
 }
 
+//CreateSecret version in Secret Manager
 func CreateSecret(parent string, secretId string) (string, error) {
 	// Build the request.
 	req := &secretpb.CreateSecretRequest{
@@ -67,6 +69,7 @@ func CreateSecret(parent string, secretId string) (string, error) {
 	return secResp.Name, nil
 }
 
+//AddSecret into Secret Manager
 func AddSecret(parent string, payload string) (string, error) {
 	// Build the request.
 	req := &secretpb.AddSecretVersionRequest{

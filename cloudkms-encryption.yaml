@@ -66,5 +66,7 @@ spec:
       - name: svc-account-volume
         secret:
           defaultMode: 420
-          secretName: cloudkms-encryption-svc-account                      
+          secretName: cloudkms-encryption-svc-account
+      nodeSelector:
+        cloud.google.com/gke-nodepool: apps                          
 ---

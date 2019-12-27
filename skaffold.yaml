@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2alpha1
+kind: Config
+metadata:
+  name: cloudkms-encryption
+build:
+  artifacts:
+  - image: gcr.io/nandanks-151422/cloudkms-encryption
+cluster:
+  namespace: apps
+deploy:
+  kubectl:
+    manifests:
+    - cloudkms-encryption.yaml

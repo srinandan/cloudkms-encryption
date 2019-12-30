@@ -19,6 +19,12 @@ Sensitive information often needs to be stored in a secure location. GCP Secret 
   b. Secret Manager Admin
   c. Secret Manager Secret Accessor
 
+## Prerequisites to build
+
+* kubectl 1.13 or higher
+* docker 19.x or higher
+* skaffold 1.1.0 or higher (optional)
+
 ## Installation
 
 ### Installation via kubectl

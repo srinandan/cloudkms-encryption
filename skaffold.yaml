@@ -5,9 +5,9 @@ metadata:
 build:
   artifacts:
   - image: gcr.io/nandanks-151422/cloudkms-encryption
-cluster:
-  namespace: apps
 deploy:
   kubectl:
+    flags:
+      global: ["--namespace=apps"]
     manifests:
     - cloudkms-encryption.yaml

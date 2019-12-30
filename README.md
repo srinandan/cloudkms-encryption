@@ -21,12 +21,25 @@ Sensitive information often needs to be stored in a secure location. GCP Secret 
 
 ## Installation
 
-Modify the kubernetes [manifest](./cloudkms-encryption.yaml#L43) and deploy it to Kubernetes. For example:
+### Installation via kubectl
+
+1. Build the [docker image](./Dockerfile) `docker build -t gcr.io/{project-id}/cloudkms-encryption`
+2. Push to a container registry `docker push gcr.io/{project-id}/cloudkms-encryption`
+3. Modify the kubernetes [manifest](./cloudkms-encryption.yaml)
 
 ```bash
 
 kubectl create secret -n {namespace} generic cloudkms-encryption-svc-account --from-file client_secret.json
 kubectl apply -n {namespace} -f cloudkms-encryption.yaml
+```
+
+### Installation via Skaffold
+
+This application can also be installed via [skaffold](https://skaffold.dev/). Modify the [skaffold.yaml](./skaffold.yaml) to set the appropriate project name.
+
+```bash
+
+skaffold run
 ```
 
 ## Supported Operations

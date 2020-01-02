@@ -1,6 +1,3 @@
-#create a secret
-#kubectl create secret -n apigee generic cloudkms-encryption-svc-account --from-file client_secret.json
----
 apiVersion: v1
 kind: Service
 metadata:

@@ -1,0 +1,19 @@
+<APIProxy revision="1" name="CloudKMS_Demo">
+    <DisplayName></DisplayName>
+    <Description></Description>
+    <CreatedAt>1576735830453</CreatedAt>
+    <LastModifiedAt>1576736445539</LastModifiedAt>
+    <BasePaths>/cloudkms</BasePaths>
+    <Policies>
+        <Policy>Set-Endpoint</Policy>
+        <Policy>Set-Decrypt-Endpoint</Policy>
+    </Policies>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+    <Resources></Resources>
+    <TargetServers></TargetServers>
+    <TargetEndpoints>
+        <TargetEndpoint>default</TargetEndpoint>
+    </TargetEndpoints>
+</APIProxy>

@@ -1,3 +1,6 @@
 LICENSE
 cloudkms-encryption.yaml
 README.md
+apiproxy
+check-prereqs.sh
+install-kms-sample.sh

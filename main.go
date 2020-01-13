@@ -42,6 +42,10 @@ func main() {
 		Methods("POST")
 	r.HandleFunc("/decrypt", apis.DecryptionHandler).
 		Methods("POST")
+	r.HandleFunc("/asmencrypt", apis.AsmEncryptionHandler).
+		Methods("POST")
+	r.HandleFunc("/asmdecrypt", apis.AsmDecryptionHandler).
+		Methods("POST")				
 	//registering this handler twice since the query param is optional
 	r.HandleFunc("/secrets/{secretName}/{version}", apis.RetrieveSecretHandler).
 		Methods("GET").

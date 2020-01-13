@@ -39,7 +39,7 @@ var (
 )
 
 //KMSName stores the url in the formatproject/{project-id}/secrets/{secret}
-var KMSName string
+var SymmetricKMSName, AsymmetricKMSName string
 
 //Parent stores the url in the format project/{project-id}
 var Parent string

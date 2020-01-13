@@ -63,8 +63,10 @@ spec:
             value: "us-west1"
           - name: KEY_RING
             value: "test"
-          - name: CRYPTO_KEY
+          - name: SYM_CRYPTO_KEY
             value: "symmetric-key"
+          - name: ASYM_CRYPTO_KEY
+            value: "asymmetric-key"
           - name: SECRET_NAME
             value: "test"
           - name: SECRET_VERSION

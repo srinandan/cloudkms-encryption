@@ -66,7 +66,19 @@ Workaound: first run `skaffold delete` and then `skaffold run`
 
 ## Supported Operations
 
-### Encrypt data
+### Environment Variables
+
+The following environment variables are mandatory:
+
+* `GOOGLE_APPLICATION_CREDENTIALS` - Path to service account json
+* `PROJECT_ID` - GCP project id
+* `REGION` - Crypto key region
+* `KEY_RING` - Crypto key ring
+* `SYM_CRYPTO_KEY` - Symmaetric key name
+* `ASYM_CRYPTO_KEY` - Assymetric key name
+
+
+### Encrypt data (Symmetric Encryption)
 
 Path: `/encrypt`
 Method: `POST`
@@ -90,7 +102,7 @@ Output:
 {"payload":"CiQATxZWh3Ky1nUed8+Uzfy1rrZ0hUrvt8J0OZUyauXbrvv2TwwSLwCPcW8BdQBpa9PXMWdOUk1c8SLNPG7J4NCyVXNfF8FLBnhgXYMGNCeY4B0673bf"}
 ```
 
-### Decrypt data
+### Decrypt data (Symmetric Decryption)
 
 Path: `/decrypt`
 Method: `POST`
@@ -110,6 +122,45 @@ Output:
 < Content-Type: application/json; charset=UTF-8
 <
 {"payload":"sample clear text data"}
+```
+
+### Encrypt data (Asymmetric Encryption)
+
+Path: `/asmencrypt`
+Method: `POST`
+Accept: text/plain
+Content-Type: application/json
+
+The response is base64 encoded
+
+```bash
+
+curl localhost:8080/asmencrypt -H "Content-Type: text/plain" -d 'this is a test'
+```
+
+Output:
+
+```json
+
+{"payload":"27dWLYAtq3tI7E3ukT5++9vEoevbb+r3uDB/CqeWxt7JrFtcoy4EMurcnhyVbsDjd7AwYB3icxs/ETEGmrxFESOR8xOI7vE2kCG+8xlFbMitIQDRsmuCwRNMyYfQMyUPtvN+eQ9YJmpxo7YqprOCk3OQ4PDew9R4VAVJxUurGbjNW5gvzLSfutqyR5y7/Ey54HRlNZCWD7GkHHi1YTIp/oc0VL9yr4K8D6P16aH4lF2H0qBF1dOGJCK19ArAZeRwPCauETdGgWepsB9BJIAvsH2CCgOGkACQHgYFIWoBCGW8CEONrlsWh455KctcZ7s4DfMI0YhTsPhu6OLpDbsTsQ=="}
+```
+
+### Decrypt data (Asymmetric Decryption)
+
+Path: `/asmdecrypt`
+Method: `POST`
+Accept: text/plain
+Content-Type: application/json 
+
+```bash
+
+curl localhost:8080/asmdecrypt -H "Content-Type: text/plain" -d '27dWLYAtq3tI7E3ukT5++9vEoevbb+r3uDB/CqeWxt7JrFtcoy4EMurcnhyVbsDjd7AwYB3icxs/ETEGmrxFESOR8xOI7vE2kCG+8xlFbMitIQDRsmuCwRNMyYfQMyUPtvN+eQ9YJmpxo7YqprOCk3OQ4PDew9R4VAVJxUurGbjNW5gvzLSfutqyR5y7/Ey54HRlNZCWD7GkHHi1YTIp/oc0VL9yr4K8D6P16aH4lF2H0qBF1dOGJCK19ArAZeRwPCauETdGgWepsB9BJIAvsH2CCgOGkACQHgYFIWoBCGW8CEONrlsWh455KctcZ7s4DfMI0YhTsPhu6OLpDbsTsQ=='
+```
+
+Output:
+
+```json
+{"payload":"this is a test"}
 ```
 
 ### Create Secret

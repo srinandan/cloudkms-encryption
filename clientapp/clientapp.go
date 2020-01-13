@@ -50,21 +50,28 @@ func initLog() {
 //initParams initializes parameters for cloud kms
 func initParams() bool {
 	projectID := os.Getenv("PROJECT_ID")
+
 	region := os.Getenv("REGION")
 	keyRing := os.Getenv("KEY_RING")
-	cryptoKey := os.Getenv("CRYPTO_KEY")
+	symCryptoKey := os.Getenv("SYM_CRYPTO_KEY")
+	asymCryptoKey := os.Getenv("ASYM_CRYPTO_KEY")
 
-	if (cryptoKey == "") || (keyRing == "") || (region == "") || (projectID == "") {
+	if (region == "") || (keyRing == "") || (symCryptoKey == "") || (projectID == "") || (asymCryptoKey == "") {
 		return false
 	}
 
 	types.Parent = "projects/" + projectID
 
-	types.KMSName = types.Parent + "/locations/" + region + "/keyRings/" +
-		keyRing + "/cryptoKeys/" + cryptoKey
+	types.SymmetricKMSName = types.Parent + "/locations/" + region + "/keyRings/" +
+		keyRing + "/cryptoKeys/" + symCryptoKey
 
-	types.Info.Printf("Initialized parameters with PROJECT_ID=%s, REGION=%s, KEY_RING=%s and CRYPTO_KEY=%s\n",
-		projectID, region, keyRing, cryptoKey)
+//Resource name 'projects/nandanks-151422/locations/us-west1/keyRings/test/cryptoKeys/asymmetric-key' 
+//does not match pattern 'projects/([^/]+)/locations/([a-zA-Z0-9_-]{1,63})/keyRings/([a-zA-Z0-9_-]{1,63})/cryptoKeys/([a-zA-Z0-9_-]{1,63})/cryptoKeyVersions/([a-zA-Z0-9_-]{1,63})'."}
+	types.AsymmetricKMSName = types.Parent + "/locations/" + region + "/keyRings/" +
+		keyRing + "/cryptoKeys/" + asymCryptoKey + "/cryptoKeyVersions/" + "1"
+
+	types.Info.Printf("Initialized parameters with PROJECT_ID=%s, REGION=%s, KEY_RING=%s, SYM_CRYPTO_KEY=%s and ASYM_CRYPTO_KEY=%s\n",
+		projectID, region, keyRing, symCryptoKey, asymCryptoKey)
 
 	return true
 }
@@ -75,7 +82,7 @@ func Initialize() {
 	initLog()
 	//init params
 	if !initParams() {
-		types.Error.Fatalln("PROJECT_ID, REGION, KEY_RING and CRYPTO_KEY are mandatory params")
+		types.Error.Fatalln("PROJECT_ID, REGION, KEY_RING, SYM_CRYPTO_KEY and ASYM_CRYPTO_KEY are mandatory params")
 	}
 	//init ctx
 	types.Ctx = context.Background()

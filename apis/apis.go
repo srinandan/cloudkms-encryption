@@ -68,7 +68,7 @@ func EncryptionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//encrypt the payload
-	b64CipherText, err := cloudkms.EncryptSymmetric(types.KMSName, clearText)
+	b64CipherText, err := cloudkms.EncryptSymmetric(types.SymmetricKMSName, clearText)
 
 	if err != nil {
 		errorHandler(w, err)
@@ -93,7 +93,7 @@ func DecryptionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//decrypt the payload
-	clearText, err := cloudkms.DecryptSymmetric(types.KMSName, b64CipherText)
+	clearText, err := cloudkms.DecryptSymmetric(types.SymmetricKMSName, b64CipherText)
 
 	if err != nil {
 		errorHandler(w, err)
@@ -132,7 +132,7 @@ func RetrieveSecretHandler(w http.ResponseWriter, r *http.Request) {
 	secretResponse := types.Response{}
 
 	if encrypted {
-		clearText, err := cloudkms.DecryptSymmetric(types.KMSName, secretBytes)
+		clearText, err := cloudkms.DecryptSymmetric(types.SymmetricKMSName, secretBytes)
 		if err != nil {
 			errorHandler(w, err)
 			return
@@ -213,7 +213,7 @@ func StoreSecretHandler(w http.ResponseWriter, r *http.Request) {
 
 	if storeSecretRequest.Encrypted {
 		//encrypt the payload
-		payload, err = cloudkms.EncryptSymmetric(types.KMSName, []byte(storeSecretRequest.Payload))
+		payload, err = cloudkms.EncryptSymmetric(types.SymmetricKMSName, []byte(storeSecretRequest.Payload))
 		if err != nil {
 			errorHandler(w, err)
 			return
@@ -229,4 +229,54 @@ func StoreSecretHandler(w http.ResponseWriter, r *http.Request) {
 	storeSecretResponse := types.Response{}
 	storeSecretResponse.Payload = secretVersion
 	responseHandler(w, storeSecretResponse)
+}
+
+//AsmEncryptionHandler handles POST /encrypt
+func AsmEncryptionHandler(w http.ResponseWriter, r *http.Request) {
+	cipherResponse := types.Response{}
+
+	//read the body
+	clearText, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
+	if err != nil {
+		errorHandler(w, err)
+		return
+	}
+
+	//encrypt the payload
+	b64CipherText, err := cloudkms.EncryptRSA(types.AsymmetricKMSName, clearText)
+
+	if err != nil {
+		errorHandler(w, err)
+		return
+	}
+
+	cipherResponse.Payload = b64CipherText
+	responseHandler(w, cipherResponse)
+}
+
+//AsmDecryptionHandler handles POST /encrypt
+func AsmDecryptionHandler(w http.ResponseWriter, r *http.Request) {
+	clearResponse := types.Response{}
+
+	//read the body
+	b64CipherText, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
+	if err != nil {
+		errorHandler(w, err)
+		return
+	}
+
+	//decrypt the payload
+	clearText, err := cloudkms.DecryptRSA(types.AsymmetricKMSName, b64CipherText)
+
+	if err != nil {
+		errorHandler(w, err)
+		return
+	}
+
+	clearResponse.Payload = string(clearText)
+	responseHandler(w, clearResponse)
 }

@@ -18,11 +18,12 @@ Sensitive information often needs to be stored in a secure location. GCP Secret 
   a. Cloud KMS CryptoKey Encrypter/Decrypter
   b. Secret Manager Admin
   c. Secret Manager Secret Accessor
+  d. Cloud KMS CryptoKey Public Key Viewer
 
 ## Prerequisites to build
 
 * kubectl 1.13 or higher
-* docker 19.x or higher
+* docker 19.x or higher (if not using skaffold)
 * skaffold 1.1.0 or higher (optional)
 
 ## Installation

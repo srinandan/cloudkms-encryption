@@ -18,9 +18,9 @@ metadata:
   name: cloudkms-encryption
 build:
   googleCloudBuild:
-    projectId: nandanks-151422
+    projectId: project-id
   artifacts:
-  - image: gcr.io/nandanks-151422/cloudkms-encryption
+  - image: gcr.io/project-id/cloudkms-encryption
 deploy:
   kubectl:
     flags:

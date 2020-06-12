@@ -31,6 +31,9 @@ metadata:
   name: cloudkms-encryption
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: cloudkms-encryption
   template:
     metadata:
       labels:
